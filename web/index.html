@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>i1 Heartbeat | 1.0.0</title>
+    <link rel="icon" type="image/x-icon" href="https://avatars.githubusercontent.com/u/196976313">
+    <style>
+      * {
+        font-family: 'Default', sans-serif;
+      }
+
+      body {
+        background-color: black;
+        color: #ffffff;
+        font-family: 'Default', sans-serif;
+        font-weight: 400;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      @font-face {
+        font-family: 'Default';
+        src: url("/font.ttf");
+      }
+
+      .container {
+        max-height: 95%;
+        width: 90%;
+        max-width: 1200px;
+        margin: auto;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: rgba(20, 20, 20, 0.7);
+        position: relative;
+        z-index: 1;
+        padding: 20px;
+      }
+
+      .conditions {
+        display: flex;
+        align-items: center;
+        position: absolute;
+        top: 100px;
+        right: 20px;
+      }
+
+      .conditions img {
+        width: 50px;
+        height: 50px;
+        margin-right: 10px;
+      }
+
+      .page {
+        padding: 20px;
+        animation: fadeIn 0.5s;
+        display: none;
+      }
+
+      .page.active {
+        display: block;
+      }
+
+      h1,
+      h2,
+      h3 {
+        color: #ffffff;
+        margin-bottom: 20px;
+      }
+
+      p {
+        color: #cccccc;
+        margin-bottom: 20px;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      select,
+      input[type="color"] {
+        background-color: #303030;
+        color: #ffffff;
+        border: 1px solid #555555;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        width: calc(100% - 22px);
+        box-sizing: border-box;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        font-size: 16px;
+      }
+
+      input[type="color"] {
+        padding: 0;
+        width: 50px;
+        height: 50px;
+        cursor: pointer;
+        border-radius: 50%;
+        border: none;
+        margin-right: 10px;
+        vertical-align: middle;
+      }
+
+      .color-wrapper {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      button {
+        background-color: #303030;
+        color: #ffffff;
+        border: none;
+        padding: 12px 24px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+        font-size: 16px;
+        margin-right: 10px;
+        margin-bottom: 15px;
+      }
+
+      button:hover {
+        background-color: #666666;
+      }
+
+      .scene-toggle {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .scene-toggle label {
+        flex-grow: 1;
+      }
+
+      .scene-toggle input[type="checkbox"] {
+        margin-left: 10px;
+      }
+
+      .popup {
+        visibility: hidden;
+        min-width: 250px;
+        margin-left: -125px;
+        background-color: #444444;
+        color: #ffffff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 10px;
+        position: fixed;
+        z-index: 1;
+        left: 50%;
+        bottom: 30px;
+        font-size: 17px;
+      }
+
+      .popup.show {
+        visibility: visible;
+        animation: fadeInOut 3s;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeInOut {
+
+        0%,
+        100% {
+          opacity: 0;
+        }
+
+        50% {
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="popup" class="popup"></div>
+      <div id="home" class="page active">
+        <h1>i1 Heartbeat</h1>
+        <p id="version-tag">Running version 1.0.0. Made by 45 Degrees.</p>
+        <p>You're running an IntelliStar 1.</p>
+        <button onclick="navigateTo('cues')">Cue Menu</button>
+        <button onclick="navigateTo('heartbeat')">Heartbeat</button>
+      </div>
+      <div id="cues" class="page">
+        <h1>Cue Menu</h1>
+        <button onclick="navigateTo('lf')">LF</button>
+        <button onclick="navigateTo('ldl')">LDL</button>
+        <button onclick="navigateTo('misc')">Misc</button>
+        <button onclick="navigateTo('custom')">Custom</button>
+        <button onclick="navigateTo('cancel')">Cancel Presentation</button>
+        <button onclick="navigateTo('home')">Home</button>
+      </div>
+      <div id="heartbeat" class="page">
+        <h1>Heartbeat</h1>
+        <p>Configure automatic LF cueing. Current Status:</p>
+        <p id="heartbeatStatus">Heartbeat is disabled.</p>
+        <p>
+        <p id="other-flavors"></p>
+
+          <label for="hbon" id="hb-detail">Loading heartbeat info from backend:</label>
+        <input id="heartbeat-on" type="text" placeholder="8" name="hbon">
+        <input id="heartbeat-every" type="text" placeholder="10" name="hbevery">
+        </p>
+        <button onclick="navigateTo('hb')">Configure Flavor</button>
+        <button onclick="navigateTo('hb2')">Configure LDL</button>
+        <button onclick="updateHeartbeatInfo('heartbeatEnabled', !heartbeatEnabled)" id="heartbeat-toggle">Enable Heartbeat</button>
+        <button onclick="updateHeartbeatInfo('heartbeatOn', document.getElementById('heartbeat-on').value)">Set Heartbeat Cue Time</button>
+        <button onclick="updateHeartbeatInfo('heartbeatEvery', document.getElementById('heartbeat-every').value)">Set Heartbeat Cue Interval</button>
+        <button onclick="forceHeartbeatCue()">Force Heartbeat</button>
+        <button onclick="navigateTo('home')">Home</button>
+      </div>
+      <div id="hb" class="page">
+        <h1>Configure Heartbeat</h1>
+        <form id="hb-form">
+          <label for="hb-select">Select Heartbeat LF:</label>
+          <select id="hb-select" name="hb"></select>
+          <button type="button" onclick="updateHeartbeatLF()">Submit</button>
+        </form>
+        <button onclick="navigateTo('heartbeat')">Back</button>
+      </div>
+      <div id="hb2" class="page">
+        <h1>Configure Heartbeat LDL</h1>
+        <form id="hb2-form">
+          <label for="hb2-select">Select Heartbeat LDL:</label>
+          <select id="hb2-select" name="hb2"></select>
+          <button type="button" onclick="updateHeartbeatLDL()">Submit</button>
+        </form>
+        <button onclick="navigateTo('heartbeat')">Back</button>
+      </div>
+      <div id="lf" class="page">
+        <h1>Cue Local Forecast</h1>
+        <form id="lf-form">
+          <label for="lf-select">Select LF:</label>
+          <select id="lf-select" name="lf"></select>
+          <button type="button" onclick="submitLF()">Submit</button>
+        </form>
+        <button onclick="navigateTo('cues')">Cue Menu</button>
+      </div>
+      <div id="ldl" class="page">
+        <h1>Cue LDL</h1>
+        <form id="ldl-form">
+          <label for="ldl-select">Select LDL:</label>
+          <select id="ldl-select" name="ldl"></select>
+          <button type="button" onclick="submitLDL()">Submit</button>
+        </form>
+        <button onclick="navigateTo('cues')">Cue Menu</button>
+      </div>
+      <div id="custom" class="page">
+        <h1>Custom Cue</h1>
+        <form id="custom-form">
+          <label for="custom-select">Enter (domestic/):</label>
+          <input id="custom-select" name="custom" type="text">
+          <br>
+          <button type="button" onclick="submitCustom()">Submit</button>
+        </form>
+        <button onclick="navigateTo('cues')">Cue Menu</button>
+      </div>
+    </div>
+    <script>
+      let heartbeatEnabled = false
+      let cues = {}
+      fetch("/resources/cues.json").then(c => c.json()).then(c => {
+        cues = c
+      })
+      async function runCue(section, index, pid, initialBg) {
+        const cue = cues[section][index]
+        let bg = 0
+        if (initialBg) {
+          bg = initialBg
+        }
+        const runCue = await fetch(`/api/playlist/run/${cue.product}`)
+        return true
+      }
+      async function kill(process) {
+        const runKill = await fetch(`/api/i2/kill/${process}`)
+        showPopup(`Killed ${process}.`)
+        return true
+      }
+      async function killI2() {
+        const runKill = await fetch("/api/i2/restart")
+        showPopup("Restarted i2 Service.")
+        return true
+      }
+      async function runCueCustom(duration, cue, pid, bg) {
+        const runCue = await fetch(`/api/playlist/run/${cue}`)
+        return true
+      }
+      async function getHeartbeatInfo() {
+        const hb = await fetch("/api/playlist/config");
+        const heartbeat = await hb.json();
+        document.getElementById('heartbeat-on').placeholder = `${heartbeat.heartbeat.runOn.startOn}`
+        document.getElementById('heartbeat-every').placeholder = `${heartbeat.heartbeat.runOn.every}`
+        document.getElementById('hb-detail').innerText = `Heartbeat Cue Time (example; ${heartbeat.heartbeat.runOn.startOn}: Cues on xx:x${heartbeat.heartbeat.runOn.startOn} every ${heartbeat.heartbeat.runOn.every} minutes):`
+        if (heartbeat.heartbeat.enabled == true) {
+          document.getElementById('heartbeatStatus').innerText = `Heartbeat is enabled. LF Flavor: domestic/${heartbeat.heartbeat.lf}.`
+          document.getElementById("other-flavors").innerText = `LDL Flavor: domestic/${heartbeat.heartbeat.ldlFlavor}`
+          document.getElementById('heartbeat-toggle').innerText = `Disable Heartbeat`
+          heartbeatEnabled = true
+        } else {
+          document.getElementById('heartbeatStatus').innerText = `Heartbeat is disabled.`
+          document.getElementById('heartbeat-toggle').innerText = `Enable Heartbeat`
+          heartbeatEnabled = false
+        }
+      }
+      async function updateHeartbeatInfo(setting, value) {
+        const hb = await fetch(`/api/heartbeat/post/${setting}/${value}`);
+        getHeartbeatInfo()
+      }
+
+      function updateHeartbeatLF() {
+        const selectedIndex = document.getElementById('hb-select').value;
+        const selectedBgIndex = document.getElementById('hb-bg').value;
+        const duration = document.getElementById('hb-duration').value;
+        const selectedLF = cues.lf[selectedIndex].product;
+        updateHeartbeatInfo("flavor", selectedLF)
+        updateHeartbeatInfo("duration", duration * 30)
+        showPopup(`Heartbeat will now use ${cues.lf[selectedIndex].name}.`);
+        if (selectedBgIndex > -1) {
+          const selectedBg = backgrounds[Number(selectedBgIndex)];
+          updateHeartbeatInfo("background", Number(selectedBg.bg))
+          showPopup(`Heartbeat will now use ${cues.lf[selectedIndex].name} with background ${selectedBg.name}.`);
+        } else if (selectedBgIndex == -9998) {
+          updateHeartbeatInfo("background", Number(9))
+          showPopup(`Heartbeat will now use ${cues.lf[selectedIndex].name} with a random background.`);
+        } else {
+          updateHeartbeatInfo("background", 0)
+          showPopup(`Heartbeat will now use ${cues.lf[selectedIndex].name} with no background.`);
+        }
+      }
+
+      function forceHeartbeatCue() {
+        fetch("/api/playlist/force")
+        showPopup("Forced a heartbeat.")
+      }
+
+      function updateHeartbeatLDL() {
+        const selectedIndex = document.getElementById('hb2-select').value;
+        const selectedLDL = cues.ldl[selectedIndex].product;
+        updateHeartbeatInfo("flavorLdl", selectedLDL)
+        showPopup(`Heartbeat will now use ${cues.ldl[selectedIndex].name} for LDL.`);
+      }
+      async function updateHeartbeatSidebarEnable() {
+        const hb = await fetch("/api/playlist/config");
+        const heartbeat = await hb.json();
+        const selectedIndex = (!(heartbeat.heartbeat.sidebar.enabled))
+        updateHeartbeatInfo("sidebarEnabled", selectedIndex)
+        if (selectedIndex == true) {
+          document.getElementById("sidebarEnableButton").innerText = "Disable Sidebar"
+        } else {
+          document.getElementById("sidebarEnableButton").innerText = "Enable Sidebar"
+        }
+        showPopup(`Heartbeat will have sidebar enabled set to ${selectedIndex}.`);
+      }
+
+      function updateHeartbeatSidebar() {
+        const selectedIndex = document.getElementById('hb3-select').value;
+        const selectedLDL = cues.sidebar[selectedIndex].product;
+        updateHeartbeatInfo("flavorSidebar", selectedLDL)
+        showPopup(`Heartbeat will now use ${cues.sidebar[selectedIndex].name} for Sidebar.`);
+      }
+      getHeartbeatInfo();
+      setInterval(getHeartbeatInfo, 120000)
+      async function headendInfo() {
+        const headend = await fetch("/api/machinecfg")
+        const headendInfo = await headend.text()
+        document.getElementById('star').innerText = `${getProperty("HeadendName", headendInfo)} | ${getProperty("HeadendId", headendInfo)}`
+      }
+
+      function getProperty(property, xmlData) {
+        try {
+          const value = xmlData.split(`"${property}" value="`)[1].split(`"`)[0]
+          return value
+        } catch {
+          return ""
+        }
+      }
+      headendInfo()
+      const backgrounds = []
+      async function setBgList() {
+        const backgroundsFetch = await fetch("/resources/backgrounds.json")
+        const backgroundsData = await backgroundsFetch.json()
+        backgroundsData.forEach((background, index) => {
+          backgrounds.push({
+            name: background.Description,
+            bg: background.ID,
+            index: index
+          })
+        });
+        populateBg()
+        populateBg2()
+      }
+
+      function populateBg() {
+        const backgroundSelect = document.getElementById("lf-bg")
+        const optionBase = document.createElement('option');
+        optionBase.value = -9999;
+        optionBase.textContent = `Default (Generic)`;
+        backgroundSelect.appendChild(optionBase);
+        const optionBase2 = document.createElement('option');
+        optionBase2.value = -9998;
+        optionBase2.textContent = `Random Background`;
+        backgroundSelect.appendChild(optionBase2);
+        backgrounds.forEach((background, index) => {
+          const option = document.createElement('option');
+          option.value = index;
+          option.textContent = `${background.name} (${background.bg})`;
+          backgroundSelect.appendChild(option);
+        });
+      }
+
+      function populateBg2() {
+        const backgroundSelect = document.getElementById("hb-bg")
+        const optionBase = document.createElement('option');
+        optionBase.value = -9999;
+        optionBase.textContent = `Default (Generic)`;
+        backgroundSelect.appendChild(optionBase);
+        const optionBase2 = document.createElement('option');
+        optionBase2.value = -9998;
+        optionBase2.textContent = `Random Background`;
+        backgroundSelect.appendChild(optionBase2);
+        backgrounds.forEach((background, index) => {
+          const option = document.createElement('option');
+          option.value = index;
+          option.textContent = `${background.name} (${background.bg})`;
+          backgroundSelect.appendChild(option);
+        });
+      }
+      setBgList()
+
+      function populateDropdown(pageId) {
+        const selectElementIds = {
+          lf: 'lf-select',
+          ldl: 'ldl-select',
+          misc: 'misc-select',
+          hb: 'hb-select',
+          hb2: 'hb2-select',
+          hb3: 'hb3-select',
+        };
+        const durationInputIds = {
+          lf: 'lf-duration',
+          ldl: 'ldl-duration',
+          misc: 'misc-duration',
+          hb: 'hb-duration'
+        };
+        const pageCues = cues[pageId];
+        const selectElement = document.getElementById(selectElementIds[pageId]);
+        const durationElement = document.getElementById(durationInputIds[pageId]);
+        selectElement.innerHTML = '';
+
+        pageCues.forEach((cue, index) => {
+          const option = document.createElement('option');
+          option.value = index;
+          option.textContent = cue.name;
+          selectElement.appendChild(option);
+        });
+
+        if (pageCues.length > 0) {
+          if (durationElement) {
+            durationElement.value = convertFramesToSeconds(pageCues[0].duration);
+          }
+        }
+
+        selectElement.addEventListener('change', () => {
+          const selectedIndex = selectElement.value;
+          if (durationElement) {
+            durationElement.value = convertFramesToSeconds(pageCues[selectedIndex].duration);
+          }
+        });
+      }
+
+      function convertFramesToSeconds(frames) {
+        return frames / 900 * 30
+      }
+
+      function submitLF() {
+        const selectedIndex = document.getElementById('lf-select').value;
+        const selectedBgIndex = document.getElementById('lf-bg').value;
+        const duration = document.getElementById('lf-duration').value;
+        const pid = (document.getElementById('lf-id').value || 3);
+        const selectedLF = cues.lf[selectedIndex].name;
+        if (selectedBgIndex > -1) {
+          const selectedBg = backgrounds[Number(selectedBgIndex)];
+          runCue("lf", selectedIndex, pid, selectedBg.bg)
+          showPopup(`Cued ${selectedLF} for ${duration} seconds with background ${selectedBg.name}`);
+        } else if (selectedBgIndex == -9998) {
+          runCue("lf", selectedIndex, pid, 9)
+          showPopup(`Cued ${selectedLF} for ${duration} seconds with a random background.`);
+        } else {
+          runCue("lf", selectedIndex, pid)
+          showPopup(`Cued ${selectedLF} for ${duration} seconds with no background`);
+        }
+      }
+
+      function submitLDL() {
+        const selectedIndex = document.getElementById('ldl-select').value;
+        const duration = document.getElementById('ldl-duration').value;
+        const pid = (document.getElementById('ldl-id').value || 1);
+        const selectedLdl = cues.ldl[selectedIndex].name;
+        runCue("ldl", selectedIndex, pid)
+        showPopup(`Cued ${selectedLdl} for ${duration} seconds`);
+      }
+
+      function submitMisc() {
+        const selectedIndex = document.getElementById('misc-select').value;
+        const duration = document.getElementById('misc-duration').value;
+        const pid = (document.getElementById('misc-id').value || 2);
+        const selectedMisc = cues.misc[selectedIndex].name;
+        runCue("misc", selectedIndex, pid)
+        showPopup(`Cued ${selectedMisc} for ${duration} seconds`);
+      }
+      async function stopPresentation(id) {
+        await fetch(`/api/playlist/cancel/${id}`)
+        showPopup(`Stopped ${id}.`)
+      }
+
+      function framesToSeconds(frames) {
+        return frames / 900 * 30
+      }
+
+      function secondsToFrames(seconds) {
+        return seconds / 30 * 900
+      }
+
+      function submitCustom() {
+        const selected = document.getElementById('custom-select').value;
+        const bg = document.getElementById('custom-bg').value;
+        const duration = document.getElementById('custom-duration').value;
+        const pid = (document.getElementById('custom-id').value || 2);
+        runCueCustom(duration, selected, pid, (bg || 0))
+        showPopup(`Cued domestic/${selected} for ${convertFramesToSeconds(duration)} seconds`);
+      }
+
+      function showPopup(message) {
+        const popup = document.getElementById('popup');
+        popup.textContent = message;
+        popup.classList.add('show');
+        setTimeout(() => popup.classList.remove('show'), 3000);
+      }
+
+      function navigateTo(pageId) {
+        const pages = document.querySelectorAll('.page');
+        pages.forEach(page => {
+          page.style.display = (page.id === pageId) ? 'block' : 'none';
+        });
+        if (['lf', 'ldl', 'hb', 'hb2'].includes(pageId)) {
+          populateDropdown(pageId);
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        navigateTo('home');
+      });
+    </script>
+  </body>
+</html>
