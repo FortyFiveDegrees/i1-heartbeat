@@ -1,0 +1,13 @@
+{
+    "port": 9092,
+    "debugger": true,
+    "heartbeat": {
+      "lf": "K",
+      "ldlFlavor": "M",
+      "runOn": {
+        "startOn": 8,
+        "every": 10
+      },
+      "enabled": true
+    }
+  }
