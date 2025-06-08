@@ -3,12 +3,20 @@
         {"name":"LDL","preview":"#","product":"M"}
     ],
     "lf": [
-        {"name":"LF","duration":225,"preview":"#","product":"K"}
+        {"name":"LF K","duration":225,"preview":"#","product":"K"},
+        {"name":"LF M","duration":225,"preview":"#","product":"M"},
+        {"name":"LF D","duration":225,"preview":"#","product":"D"},
+        {"name":"LF E","duration":225,"preview":"#","product":"E"},
+        {"name":"Squeezeback","duration":225,"preview":"#","product":"S"}
+
     ],
     "hb": [
         {"name":"LDL","preview":"#","product":"M"}
     ],
     "hb2": [
-        {"name":"LF","duration":225,"preview":"#","product":"K"}
-    ]
+        {"name":"LF K","duration":225,"preview":"#","product":"K"},
+        {"name":"LF M","duration":225,"preview":"#","product":"M"},
+        {"name":"LF D","duration":225,"preview":"#","product":"D"},
+        {"name":"LF E","duration":225,"preview":"#","product":"E"},
+        {"name":"Squeezeback","duration":225,"preview":"#","product":"S"}    ]
 }
