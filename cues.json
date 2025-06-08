@@ -1,0 +1,14 @@
+{
+    "ldl": [
+        {"name":"LDL","preview":"#","product":"M"}
+    ],
+    "lf": [
+        {"name":"LF","duration":225,"preview":"#","product":"K"}
+    ],
+    "hb": [
+        {"name":"LDL","preview":"#","product":"M"}
+    ],
+    "hb2": [
+        {"name":"LF","duration":225,"preview":"#","product":"K"}
+    ]
+}
